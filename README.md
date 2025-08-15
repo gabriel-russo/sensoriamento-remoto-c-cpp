@@ -8,7 +8,7 @@ https://gdal.org/en/stable/user/raster_data_model.html#raster-data-model
 - Boost.Filesystem: `sudo apt install libboost-filesystem-dev` (ou `libboost-all-dev`)
 - GDAL: `sudo apt install libgdal-dev`
 
-### Raster.cpp
+### raster.cpp
 - [Boost.Filesystem](https://www.boost.org/doc/libs/1_88_0/libs/filesystem/doc/index.htm)
 - [GDAL](https://gdal.org/en/stable/download.html)
 

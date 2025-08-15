@@ -100,12 +100,21 @@ int main(int argc, const char *argv[])
   divider();
 
   std::cout << "┣ " << raster_file.filename().string() << std::endl;
-  std::cout << "┣━━━━━ Informações matriciais do raster ━━━━━┫" << std::endl;
+  std::cout << "┣━━━━━      Informações do raster       ━━━━━┫" << std::endl;
   std::cout << "┣ Tipo do número digital do píxel: " << data_type_description(r_ds->GetRasterBand(1)->GetRasterDataType()) << std::endl;
   std::cout << "┣ Quantidade de Linhas: " << r_ds->GetRasterYSize() << std::endl;
   std::cout << "┣ Quantidade de Colunas: " << r_ds->GetRasterXSize() << std::endl;
   std::cout << "┣ Quantidade de Bandas: " << r_ds->GetRasterCount() << std::endl;
+  std::cout << "┣ Pixels sem valor são interpretados com: " << r_ds->GetRasterBand(1)->GetNoDataValue() << std::endl;
 
+  for (int i = 1; i <= r_ds->GetRasterCount(); i++)
+  {
+    double minmax[2] = {-999, -999};
+    r_ds->GetRasterBand(i)->ComputeRasterMinMax(1, minmax);
+    printf("┣ Banda %d - Valor mínimo de pixel é de %.2f e máximo de %.2f\n", i, minmax[0], minmax[1]);
+  }
+
+  std::cout << "┣━━━━━      Informações do arquivo      ━━━━━┫" << std::endl;
   const uintmax_t file_size = boost::filesystem::file_size(raster_file);
 
   if (kilobytes(file_size) >= 1000000)
@@ -113,7 +122,7 @@ int main(int argc, const char *argv[])
     std::cout << "┣ Tamanho do arquivo aprox.: " << gigabytes(file_size) << " GB" << std::endl;
   }
 
-  if (kilobytes(file_size) >= 1000)
+  if (kilobytes(file_size) >= 1000 && kilobytes(file_size) < 1000000)
   {
     std::cout << "┣ Tamanho do arquivo aprox.: " << megabytes(file_size) << " MB" << std::endl;
   }
@@ -123,7 +132,6 @@ int main(int argc, const char *argv[])
     std::cout << "┣ Tamanho do arquivo aprox.: " << kilobytes(file_size) << " kb" << std::endl;
   }
 
-  std::cout << "┣━━━━━      Informações do arquivo      ━━━━━┫" << std::endl;
   std::cout << "┣ Nome curto do driver: " << r_ds->GetDriver()->GetDescription() << std::endl;
   std::cout << "┣ Nome longo do driver: " << r_ds->GetDriver()->GetMetadataItem(GDAL_DMD_LONGNAME) << std::endl;
   std::cout << "┣━━━ Informações do sistema de referência ━━━┫" << std::endl;
