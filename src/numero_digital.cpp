@@ -1,8 +1,8 @@
 #include "boost/filesystem.hpp"
 #include "gdal/gdal_priv.h"
 #include <errno.h>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 #define LOG(msg) std::cout << msg << std::endl;
 #define ERR(msg) std::cerr << msg << std::endl;

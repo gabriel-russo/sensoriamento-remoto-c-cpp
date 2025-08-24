@@ -47,3 +47,9 @@ data/
 
 # Binarios
 rgb
+numero_digital
+*.txt
+.fleet
+.idea
+.vscode
+
