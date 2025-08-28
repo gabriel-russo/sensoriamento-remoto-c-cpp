@@ -1,11 +1,18 @@
-CXX = g++
-CFLAGS = -Wall -Wextra -std=c++11
+CXX = clang++
+CXXFLAGS = -Weverything -Wextra -std=c++17 -Wno-c++98-compat -Wno-unsafe-buffer-usage
 
 raster:
-	$(CXX) $(CFLAGS) src/raster.cpp -o raster -lgdal -lboost_filesystem
+	$(CXX) $(CXXFLAGS) src/raster.cpp -o raster -lgdal -lboost_filesystem
 
 rgb:
-	$(CXX) $(CFLAGS) src/rgb.cpp -o rgb -lgdal
+	$(CXX) $(CXXFLAGS) src/rgb.cpp -o rgb -lgdal
+
+to_byte:
+	$(CXX) $(CXXFLAGS) src/to_byte.cpp -o to_byte -lgdal
 
 numero_digital:
-	$(CXX) $(CFLAGS) src/numero_digital.cpp -o numero_digital -lgdal -lboost_filesystem
+	$(CXX) $(CXXFLAGS) src/numero_digital.cpp -o numero_digital -lgdal
+
+.PHONY = format
+format:
+	clang-format --style=Microsoft -i src/*.cpp
