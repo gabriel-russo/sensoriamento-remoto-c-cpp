@@ -16,7 +16,7 @@ struct Raster
     std::vector<signed int> data;
 };
 
-Raster read_ascii(std::filesystem::path file_path);
+Raster *read_ascii(std::filesystem::path file_path);
 void print_statistics(Raster &raster);
 void set_statistics(Raster &raster);
 void gamma(Raster &raster, float factor);

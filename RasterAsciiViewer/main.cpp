@@ -32,19 +32,19 @@ int main(int argc, char *argv[])
     window->show();
 
     // Processando txt
-    RasterAscii::Raster raster_data = RasterAscii::read_ascii("/band15.txt");
+    RasterAscii::Raster *raster_data = RasterAscii::read_ascii("band15.txt");
 
-    QImage raster(raster_data.Ncols, raster_data.Nrows, QImage::Format_Grayscale8);
+    QImage raster(raster_data->Ncols, raster_data->Nrows, QImage::Format_Grayscale8);
 
-    RasterAscii::print_statistics(raster_data);
+    RasterAscii::print_statistics(*raster_data);
 
-    RasterAscii::to_8bit_grayscale(raster_data);
+    RasterAscii::to_8bit_grayscale(*raster_data);
 
-    for (int i = 0; i < raster_data.Nrows; i++)
+    for (int i = 0; i < raster_data->Nrows; i++)
     {
-        for (int j = 0; j < raster_data.Ncols; j++)
+        for (int j = 0; j < raster_data->Ncols; j++)
         {
-            raster.setPixel(j, i, raster_data.data[i * raster_data.Ncols + j]);
+            raster.setPixel(j, i, raster_data->data[i * raster_data->Ncols + j]);
         }
     }
 

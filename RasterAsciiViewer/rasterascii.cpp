@@ -6,46 +6,64 @@
 #include <math.h>
 #include <vector>
 
-RasterAscii::Raster RasterAscii::read_ascii(std::filesystem::path file_path)
+RasterAscii::Raster *RasterAscii::read_ascii(std::filesystem::path file_path)
 {
     if (!std::filesystem::exists(file_path))
     {
-        return RasterAscii::Raster();
+        return nullptr;
     }
 
     std::ifstream file(file_path);
 
     if (!file.is_open())
     {
-        return RasterAscii::Raster();
+        return nullptr;
     }
 
-    RasterAscii::Raster raster;
+    RasterAscii::Raster *raster = new RasterAscii::Raster();
     std::string line;
+
+    std::string metadata;
+    std::getline(file, metadata);
+    metadata += '\0';
+
     std::string str_buf;
-
-    raster.Nrows = 50;
-    raster.Ncols = 50;
-
-    raster.data.reserve(raster.Ncols * raster.Nrows);
-    line.reserve(raster.Ncols * 5);
     str_buf.reserve(3);
+
+    short int sep_count = 0;
+    for (const char &c : metadata)
+    {
+        if (c == ';' || c == '\0')
+        {
+            if (sep_count == 0)
+                raster->Nrows = std::stoi(str_buf);
+            if (sep_count == 1)
+                raster->Ncols = std::stoi(str_buf);
+            if (sep_count == 2)
+                raster->min = std::stoi(str_buf);
+            if (sep_count == 3)
+                raster->max = std::stoi(str_buf);
+            sep_count++;
+            str_buf = "";
+            continue;
+        }
+        str_buf += c;
+    }
+
+    raster->data.reserve(raster->Ncols * raster->Nrows);
+    line.reserve(256);
 
     while (std::getline(file, line))
     {
-        for (int i = 0; i < line.size(); i++)
+        line += '\0';
+        for (const char &c : line)
         {
-            const char c = line[i];
-
-            if (c == ' ' || (i + 1) == line.size())
+            if (c == ' ' || c == '\0')
             {
-                raster.data.push_back(std::stoi(str_buf));
-
+                raster->data.push_back(std::stoi(str_buf));
                 str_buf = "";
-
                 continue;
             }
-
             str_buf += c;
         }
     }
@@ -58,12 +76,6 @@ void RasterAscii::print_statistics(RasterAscii::Raster &raster)
     std::cout << "Matrix: " << raster.Nrows << " x " << raster.Ncols << std::endl;
     std::cout << "Min: " << raster.min << std::endl;
     std::cout << "Max: " << raster.max << std::endl;
-}
-
-void RasterAscii::set_statistics(RasterAscii::Raster &raster)
-{
-    raster.min = *std::min_element(raster.data.begin(), raster.data.end());
-    raster.max = *std::max_element(raster.data.begin(), raster.data.end());
 }
 
 void RasterAscii::gamma(RasterAscii::Raster &raster, float factor)
