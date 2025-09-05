@@ -1,9 +1,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "rasterascii.h"
 #include <QGraphicsView>
 #include <QMainWindow>
-#include <string>
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -19,13 +19,16 @@ class MainWindow : public QMainWindow
   public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void showRaster(std::string path);
 
   private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
+    RasterAscii *raster;
+    void showRaster();
 
   private slots:
     void on_actionCarregar_triggered();
+    void on_actionGamma_triggered();
+    void on_actionNegativo_triggered();
 };
 #endif // MAINWINDOW_H

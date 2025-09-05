@@ -58,7 +58,15 @@
     </property>
     <addaction name="actionCarregar"/>
    </widget>
+   <widget class="QMenu" name="menuPreProcessar">
+    <property name="title">
+     <string>Pré-processamento</string>
+    </property>
+    <addaction name="actionGamma"/>
+    <addaction name="actionNegativo"/>
+   </widget>
    <addaction name="menuArquivo"/>
+   <addaction name="menuPreProcessar"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionCarregar">
@@ -70,6 +78,16 @@
    </property>
    <property name="toolTip">
     <string>Carregar arquivo</string>
+   </property>
+  </action>
+  <action name="actionGamma">
+   <property name="text">
+    <string>Gamma</string>
+   </property>
+  </action>
+  <action name="actionNegativo">
+   <property name="text">
+    <string>Negativo</string>
    </property>
   </action>
  </widget>
