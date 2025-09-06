@@ -56,20 +56,23 @@
     <property name="separatorsCollapsible">
      <bool>false</bool>
     </property>
-    <addaction name="actionCarregar"/>
+    <addaction name="actionLoad"/>
+    <addaction name="actionReload"/>
    </widget>
-   <widget class="QMenu" name="menuPreProcessar">
+   <widget class="QMenu" name="menuTransform">
     <property name="title">
-     <string>Pré-processamento</string>
+     <string>Transformadas</string>
     </property>
     <addaction name="actionGamma"/>
-    <addaction name="actionNegativo"/>
+    <addaction name="actionNegative"/>
+    <addaction name="actionLogarithm"/>
+    <addaction name="actionThreshold"/>
    </widget>
    <addaction name="menuArquivo"/>
-   <addaction name="menuPreProcessar"/>
+   <addaction name="menuTransform"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionCarregar">
+  <action name="actionLoad">
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -82,12 +85,27 @@
   </action>
   <action name="actionGamma">
    <property name="text">
-    <string>Gamma</string>
+    <string>Gama</string>
    </property>
   </action>
-  <action name="actionNegativo">
+  <action name="actionNegative">
    <property name="text">
     <string>Negativo</string>
+   </property>
+  </action>
+  <action name="actionLogarithm">
+   <property name="text">
+    <string>Logarítimo</string>
+   </property>
+  </action>
+  <action name="actionReload">
+   <property name="text">
+    <string>Recarregar</string>
+   </property>
+  </action>
+  <action name="actionThreshold">
+   <property name="text">
+    <string>Limiar</string>
    </property>
   </action>
  </widget>

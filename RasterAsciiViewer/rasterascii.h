@@ -12,27 +12,33 @@ class RasterAscii
     signed int max = 0;
     signed int min = 0;
     std::vector<signed int> data;
+    std::vector<float> p_data;
 
   public:
-    RasterAscii();
-    ~RasterAscii();
-    signed int getColumns();
-    signed int getRows();
-    signed int getPixel(int line, int column);
+    RasterAscii() = default;
+    ~RasterAscii() = default;
+    signed int getColumns() const;
+    signed int getRows() const;
+    signed int getMin() const;
+    signed int getMax() const;
+    signed int getPixel(int line, int column) const;
 
     // IO
     bool read_ascii(std::string file_path);
 
     // Processamento de imagens
     void to_8bit_grayscale();
-    signed int to_8bit_grayscale(signed int pixel);
+    signed int to_8bit_grayscale(signed int pixel) const;
+    float normalize_pixel(signed int pixel) const;
 
-    // Pré-processamento
+    // Transformadas
     void gamma(signed short int c, float epsilon);
     void negative();
+    void logarithm(signed short int c);
+    void threshold(signed int value);
 
     // Status
-    void print_statistics();
+    void print_statistics() const;
 };
 
 #endif // RASTERASCII_H

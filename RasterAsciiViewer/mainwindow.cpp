@@ -4,8 +4,6 @@
 #include <QFileDialog>
 #include <QInputDialog>
 
-#include <iostream>
-
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -21,7 +19,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::showRaster()
 {
-    QImage raster(this->raster->getColumns(), this->raster->getRows(), QImage::Format_Grayscale16);
+    QImage raster(this->raster->getColumns(), this->raster->getRows(), QImage::Format_Grayscale8);
 
     this->raster->print_statistics();
 
@@ -42,7 +40,7 @@ void MainWindow::showRaster()
 // Nome do método deve seguir o padrão abaixo para funcionar.
 // void on_<object name>_<signal name>(<signal parameters>);
 // https://doc.qt.io/qt-6/qmetaobject.html#connectSlotsByName
-void MainWindow::on_actionCarregar_triggered()
+void MainWindow::on_actionLoad_triggered()
 {
     QFileDialog fileDialog(this);
     fileDialog.setFileMode(QFileDialog::ExistingFile);
@@ -52,16 +50,32 @@ void MainWindow::on_actionCarregar_triggered()
     {
         if (!fileDialog.selectedFiles().empty())
         {
-            this->raster->read_ascii(fileDialog.selectedFiles().at(0).toStdString());
-            this->showRaster();
+            std::string path = fileDialog.selectedFiles().at(0).toStdString();
+
+            if (this->raster->read_ascii(path))
+            {
+                this->raster_file_path = path;
+                this->showRaster();
+            }
         }
+    }
+}
+
+void MainWindow::on_actionReload_triggered()
+{
+    if (!this->raster_file_path.empty())
+    {
+        delete this->raster;
+        this->raster = new RasterAscii();
+        this->raster->read_ascii(this->raster_file_path);
+        this->showRaster();
     }
 }
 
 void MainWindow::on_actionGamma_triggered()
 {
     double value =
-        QInputDialog::getDouble(this, tr("Adicionar brilho gamma"), tr("Valor do gamma [0.0 - 2.0]"), 0, 0, 2., 5);
+        QInputDialog::getDouble(this, tr("Adicionar brilho gamma"), tr("Valor do gamma [0.0 - 30.0]"), 0, 0, 30., 2);
 
     if (value)
     {
@@ -70,8 +84,26 @@ void MainWindow::on_actionGamma_triggered()
     }
 }
 
-void MainWindow::on_actionNegativo_triggered()
+void MainWindow::on_actionNegative_triggered()
 {
     this->raster->negative();
     this->showRaster();
+}
+
+void MainWindow::on_actionLogarithm_triggered()
+{
+    this->raster->logarithm(1);
+    this->showRaster();
+}
+
+void MainWindow::on_actionThreshold_triggered()
+{
+    int value = QInputDialog::getInt(this, tr("Escolher limiar"), tr("Valor do limiar"), 128, this->raster->getMin(),
+                                     this->raster->getMax());
+
+    if (value)
+    {
+        this->raster->threshold(value);
+        this->showRaster();
+    }
 }

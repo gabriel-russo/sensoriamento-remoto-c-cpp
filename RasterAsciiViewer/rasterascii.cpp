@@ -6,19 +6,27 @@
 #include <math.h>
 #include <vector>
 
-RasterAscii::RasterAscii(){};
-
-signed int RasterAscii::getColumns()
+signed int RasterAscii::getColumns() const
 {
     return this->Ncols;
 }
 
-signed int RasterAscii::getRows()
+signed int RasterAscii::getRows() const
 {
     return this->Nrows;
 }
 
-signed int RasterAscii::getPixel(int line, int column)
+signed int RasterAscii::getMin() const
+{
+    return this->min;
+}
+
+signed int RasterAscii::getMax() const
+{
+    return this->max;
+}
+
+signed int RasterAscii::getPixel(int line, int column) const
 {
     // O vector guarda a matriz achatada, utilize a fórmula:
     // index = row ⋅ nCols + col
@@ -89,14 +97,14 @@ bool RasterAscii::read_ascii(std::string file_path)
     return true;
 }
 
-void RasterAscii::print_statistics()
+void RasterAscii::print_statistics() const
 {
     std::cout << "Matrix: " << this->Nrows << " x " << this->Ncols << std::endl;
     std::cout << "Min: " << this->min << std::endl;
     std::cout << "Max: " << this->max << std::endl;
 }
 
-signed int RasterAscii::to_8bit_grayscale(signed int pixel)
+signed int RasterAscii::to_8bit_grayscale(signed int pixel) const
 {
     return ((pixel - this->min) / (this->max - (this->min * 1.0))) * 255;
 }
@@ -109,8 +117,21 @@ void RasterAscii::to_8bit_grayscale()
     }
 }
 
-/* Transformação de potência (gama)
-    s = cr^ε
+float RasterAscii::normalize_pixel(signed int pixel) const
+{
+    return ((pixel - this->min) / (this->max - (this->min * 1.0)));
+}
+
+/* Algoritmos de processamento digital de imagens.
+
+Fontes:
+ - Processamento digital de imagens, 3ª edição, 2010.
+ - https://www.lcad.icmc.usp.br/~jbatista/procimg/pre_proc.pdf
+
+*/
+
+/* Transformada exponencial (gama)
+    s = c ⋅ r^ε
 
     onde,
     c -> constante correção gama
@@ -126,7 +147,7 @@ void RasterAscii::gamma(signed short int c, float epsilon)
 
     for (signed int &pixel : this->data)
     {
-        pixel = (c * std::pow((pixel - this->min) / (this->max - this->min * 1.0), epsilon)) * 255;
+        pixel = (c * std::pow(this->normalize_pixel(pixel), epsilon)) * this->max;
 
         if (max < pixel)
         {
@@ -142,12 +163,11 @@ void RasterAscii::gamma(signed short int c, float epsilon)
     this->min = min;
 }
 
-/* Negativo da imagem
+/* Transformada Negativa
     s = (L - 1) - r
 
     onde,
     L -> Níveis de cinza (Aqui usamos o max, pois não trabalhamos com faixas de intensidade)
-    1 -> Correção para variar de 0 - L
     r -> píxel
 
     Gonzalez (2010, p. 70)
@@ -156,6 +176,7 @@ void RasterAscii::negative()
 {
     signed int max = 0;
     signed int min = 0;
+
     for (signed int &pixel : this->data)
     {
         pixel = std::clamp<signed int>((this->max - 1) - pixel, 0, this->max);
@@ -170,6 +191,73 @@ void RasterAscii::negative()
             min = pixel;
         }
     }
+
+    this->max = max;
+    this->min = min;
+}
+
+/* Transformada logarítmica
+    s = c ⋅ log(1 + r)
+
+    onde,
+    c -> constante de correção
+    r -> píxel
+
+    Gonzalez (2010, p. 71)
+*/
+void RasterAscii::logarithm(signed short int c)
+{
+    signed int max = 0;
+    signed int min = 0;
+
+    for (signed int &pixel : this->data)
+    {
+        pixel = static_cast<signed int>((c * std::log(1 + this->normalize_pixel(pixel))) * this->max);
+
+        if (max < pixel)
+        {
+            max = pixel;
+        }
+
+        if (min > pixel)
+        {
+            min = pixel;
+        }
+    }
+
+    this->max = max;
+    this->min = min;
+}
+
+/* Transformada de limiarização
+    s = T(r)
+
+    onde,
+    T -> Função de transformação
+    r -> píxel
+
+    Gonzalez (2010, p. 70)
+*/
+void RasterAscii::threshold(signed int value)
+{
+    signed int max = 0;
+    signed int min = 0;
+
+    for (signed int &pixel : this->data)
+    {
+        pixel = pixel < value ? 0 : 255;
+
+        if (max < pixel)
+        {
+            max = pixel;
+        }
+
+        if (min > pixel)
+        {
+            min = pixel;
+        }
+    }
+
     this->max = max;
     this->min = min;
 }
